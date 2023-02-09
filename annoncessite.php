@@ -4,6 +4,7 @@
 <body>
 
 <?php 
+include('./config/config.php');
 session_start();
 error_reporting(E_ERROR | E_PARSE);
 echo $_SESSION['delete_message'];
@@ -19,7 +20,7 @@ session_unset();
             <div class="col">
         
                 <div id="cover">
-                <img src="./image/cover-img.png" alt="">
+                <img src="./images/cover-img.png" alt="">
                     <div id="searching">
                         <input type="search" name="search" id="search" placeholder="Search...">
                     </div>
@@ -50,95 +51,78 @@ session_unset();
             
         </form>
     </div>
-
-
-    <?php
-        if($_SERVER['REQUEST_METHOD'] == 'GET'){
-            $id = $_GET['id'];
-            echo $id;
-        }
-
-    ?>
         
-        <div class="row ">
         
         <?php 
                 
-                    
-            
-            include('./config/config.php');
-            
-            
-            
+                
             $keyword = $_POST['search'];
-            $search = $_POST['search'];
+            
             $prixMax = $_POST['maxPrix'];
             $prixMin = $_POST['minPrix'];
             $type = $_POST['Type'];
-            
-            $sql = "SELECT * FROM `annonce` WHERE titre like '%$keyword%'";
-            
-            if(!empty($_POST['minPrix']) || !empty($_POST['maxPrix'])){
+            error_reporting(E_ERROR | E_PARSE);
+
+
+
+            if(!empty($keyword)){
+
+                $sql = "SELECT * FROM `annonce` WHERE titre like '%$keyword%'";            
+            }
+            elseif(!empty($prixMin) || !empty($prixMax)){
                 $sql = "SELECT * FROM `annonce` WHERE montant BETWEEN '$prixMin' AND '$prixMax' ";
-            }elseif(!empty($_POST['Type']) && empty($_POST['minPrix']) && empty($_POST['maxPrix'])){
+            }elseif(!empty($type) && empty($prixMin) && empty($prixMax)){
                 $sql = "SELECT * FROM `annonce` WHERE type_annonce = '$type'";
             }
-            elseif((!empty($_POST['minPrix']) || !empty($_POST['maxPrix'])) && !empty($_POST['Type'])){
+            elseif((!empty($prixMin) || !empty($prixMax)) && !empty($type)){
                 $sql = "SELECT * FROM `annonce` WHERE montant BETWEEN '$prixMin' AND '$prixMax' AND type_annonce = '$type'";
             }
             
+        ?>
 
-            $keyword = $_POST['Search'];
-            $prixMin =  $_POST['minPrix'];
-            $prixMax =  $_POST['maxPrix'];
-            $type = $_POST['Type'];
-            
-
-
-            
-            
-                
-                $res = mysqli_query($connect, $sql);
-
+        <div class="row ">
         
-                while ($champ = mysqli_fetch_assoc($res))
-                {
-                    echo "                
-                        <div class='cart col-sm-12 col-md-12 col-lg-12 '>
-                            <div class='cart'>                                            
-                                <img class='detail-img' src='".$champ['image']."' alt='Card image cap'>
-                                <div class='detail-body'>
-                                    <div class='title-dh'>                    
-                                        <h5 class='card-title'>".$champ['titre']."</h5>
-                                        <h7 class='card-title'>".$champ['type_annonce']."</h7>
-                                        <h6 class='card-title'> ".$champ['montant']."</h6> 
-                                    </div>
-                                    <div class='descrip'>
-                                        <p>".$champ['description']."</p>
-                                    </div>                                           
-                                    <div class='btns'>                                     
-                                        <form method='get' action='modifier.php'>
-                                            <button class='btn btn-modifier' name='id' value='".$champ['id']. "'>Modifier</button>
-                                        </form>  
-                                        
-                                        <form method='get' action='./delete.php'> 
-                                            <button class='btn btn-supprimer' name='id' value='".$champ['id']."' >Supprimer</button>
-                                        </form>
-                                    </div>                                            
-                                </div>  
-                            </div>                               
-                        </div>
-                                
-                        
-                               
-                                
-                    ";
-                }
+        <?php    
+           
+         
+                
             
+            $res = mysqli_query($connect, $sql);
+            if(mysqli_num_rows ($res) == 0){
+                echo "<center><h1>Pas des resultats!</h1></center>";
+            }
+        
+            while ($champ = mysqli_fetch_assoc($res))
+            {
+                echo "                
+                    <div class='cart col-sm-12 col-md-12 col-lg-12 '>
+                        <div class='cart'>                                            
+                            <img class='detail-img' src='".$champ['image']."' alt='Card image cap'>
+                            <div class='detail-body'>
+                                <div class='title-dh'>                    
+                                    <h5 class='card-title'>".$champ['titre']."</h5>
+                                    <h7 class='card-title'>".$champ['type_annonce']."</h7>
+                                    <h6 class='card-title'> ".$champ['montant']." dhs</h6> 
+                                </div>
+                                <div class='descrip'>
+                                    <p>".$champ['description']."</p>
+                                </div>                                           
+                                <div class='btns'>                                     
+                                    <form method='get' action='modifier.php'>
+                                        <button class='btn btn-modifier' name='id' value='".$champ['id']. "'>Modifier</button>
+                                    </form>  
+                                    
+                                    <form method='get' action='./delete.php'> 
+                                        <button class='btn btn-supprimer' name='id' value='".$champ['id']."' >Supprimer</button>
+                                    </form>
+                                </div>                                            
+                            </div>  
+                        </div>                               
+                    </div>                
+                ";
+            }
+           
 
-            
-                
-                
         ?>
         </div> 
         
@@ -279,6 +263,10 @@ nav.navbar {
 
     color: #FFFFFF;
 }
+a.logo:hover {
+    color: #ffffff;
+    font-size: 31px;
+}
 ul {
     list-style: none;
 }
@@ -378,6 +366,12 @@ font-weight: 700;
 font-size: 16px;
 line-height: 10px;
 }
+center h1 {
+    position: RELATIVE;
+    font-size: 36px;
+    color: #fb4d4d;
+    top: 460%;
+}
 div#filtering {
     display: flex;
     flex-direction: row;
@@ -418,6 +412,14 @@ input#btn-filter {
     line-height: 16px;
 
     color: #10454F;
+}
+select {
+    word-wrap: normal;
+    border: none;
+    color: #756464;
+    font-size: 12px;
+    border-radius: 11px;
+    padding: 0px 8px;
 }
 
 
